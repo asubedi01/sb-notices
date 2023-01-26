@@ -1,6 +1,6 @@
 <?php
 
-namespace SmashBalloon\Framework;
+namespace Smashballoon\Framework;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
