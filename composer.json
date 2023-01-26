@@ -6,9 +6,9 @@
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "Smashballoon\\Notices\\": "",
-            "files": ["Utilites/functions.php"]
-        }
+            "Smashballoon\\Framework\\": ""
+        },
+        "files": ["Utilites/functions.php"]
     },
     "require": {},
     "require-dev": {}
