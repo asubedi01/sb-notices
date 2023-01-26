@@ -46,7 +46,7 @@ if( ! function_exists( 'sb_locate_template' ) ) {
 		}
 
 		if ( ! $default_path ) {
-			$default_path = untrailingslashit( plugin_dir_path( __DIR__ ) . '/templates/' );
+			$default_path = untrailingslashit( plugin_dir_path( __DIR__ ) ) . '/templates/';
 			$default_path = apply_filters( 'sb_default_template_path', $default_path );
 		}
 
