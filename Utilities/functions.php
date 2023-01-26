@@ -1,9 +1,6 @@
 <?php
-/**
- * SBNotices Core Functions
- *
- * @package SBNotices
- */
+
+namespace SmashBalloon\Framework;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -16,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @param string $message Message to log.
  * @param string $version Version the message was added in.
  */
-function sb_notices_doing_it_wrong( $function, $message, $version ) {
+function sb_doing_it_wrong( $function, $message, $version ) {
 	// @codingStandardsIgnoreStart
 	$message .= ' Backtrace: ' . wp_debug_backtrace_summary();
 	
@@ -44,13 +41,14 @@ function sb_notices_doing_it_wrong( $function, $message, $version ) {
  *
  * @return string Template path.
  */
-function sb_notices_locate_template( $template_name, $template_path = '', $default_path = '' ) {
+function sb_locate_template( $template_name, $template_path = '', $default_path = '' ) {
 	if ( ! $template_path ) {
-		$template_path = sb_notices()->template_path();
+		$template_path = apply_filters( 'sb_template_path', 'smashballoon/');
 	}
 
 	if ( ! $default_path ) {
-		$default_path = sb_notices()->plugin_path() . '/templates/';
+		$default_path = untrailingslashit( plugin_dir_path( __DIR__ ) . '/templates/' );
+        $default_path = apply_filters( 'sb_default_template_path', $default_path );
 	}
 
 	// Look within passed path within the theme - this is priority.
@@ -67,7 +65,7 @@ function sb_notices_locate_template( $template_name, $template_path = '', $defau
 	}
 
 	// Return what we found.
-	return apply_filters( 'sb_notices_locate_template', $template, $template_name, $template_path );
+	return apply_filters( 'sb_locate_template', $template, $template_name, $template_path );
 }
 
 /**
@@ -78,22 +76,22 @@ function sb_notices_locate_template( $template_name, $template_path = '', $defau
  * @param string $template_path   Template path. (default: '').
  * @param string $default_path    Default path. (default: '').
  */
-function sb_notices_get_template( $template_name, $args = array(), $template_path = '', $default_path = '' ) {
-	$cache_key = sanitize_key( implode( '-', array( 'template', $template_name, $template_path, $default_path, SB_NOTICES_VERSION ) ) );
-	$template  = (string) wp_cache_get( $cache_key, 'sb-notices' );
+function sb_get_template( $template_name, $args = array(), $template_path = '', $default_path = '' ) {
+	$cache_key = sanitize_key( implode( '-', array( 'template', $template_name, $template_path, $default_path ) ) );
+	$template  = (string) wp_cache_get( $cache_key, 'smashballoon' );
 
 	if ( ! $template ) {
-		$template = sb_notices_locate_template( $template_name, $template_path, $default_path );
-		wp_cache_set( $cache_key, $template, 'sb-notices' );
+		$template = sb_locate_template( $template_name, $template_path, $default_path );
+		wp_cache_set( $cache_key, $template, 'smashballoon' );
 	}
 
 	// Allow 3rd party plugin filter template file from their plugin.
-	$filter_template = apply_filters( 'sb_notices_get_template', $template, $template_name, $args, $template_path, $default_path );
+	$filter_template = apply_filters( 'sb_get_template', $template, $template_name, $args, $template_path, $default_path );
 
 	if ( $filter_template !== $template ) {
 		if ( ! file_exists( $filter_template ) ) {
 			/* translators: %s template */
-			sb_notices_doing_it_wrong( __FUNCTION__, sprintf( __( '%s does not exist.', 'sb-notices' ), '<code>' . $template . '</code>' ), '6.2.2' );
+			sb_doing_it_wrong( __FUNCTION__, sprintf( __( '%s does not exist.', 'sb-notices' ), '<code>' . $template . '</code>' ), '6.2.2' );
 			return;
 		}
 		$template = $filter_template;
@@ -108,9 +106,9 @@ function sb_notices_get_template( $template_name, $args = array(), $template_pat
 
 	if ( ! empty( $args ) && is_array( $args ) ) {
 		if ( isset( $args['action_args'] ) ) {
-			sb_notices_doing_it_wrong(
+			sb_doing_it_wrong(
 				__FUNCTION__,
-				__( 'action_args should not be overwritten when calling sb_notices_get_template.', 'sb-' ),
+				__( 'action_args should not be overwritten when calling sb_get_template.', 'sb-notices' ),
 				'1.0.0'
 			);
 			unset( $args['action_args'] );
@@ -118,9 +116,9 @@ function sb_notices_get_template( $template_name, $args = array(), $template_pat
 		extract( $args );
 	}
 
-	do_action( 'sb_notices_before_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args'] );
+	do_action( 'sb_before_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args'] );
 
 	include $action_args['located'];
 
-	do_action( 'sb_notices_after_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args'] );
+	do_action( 'sb_after_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args'] );
 }

@@ -1,12 +1,13 @@
 {
-    "name": "smashballoon/sb-notices",
-    "description": "The SmashBalloon notices library",
+    "name": "smashballoon/framework",
+    "description": "WordPress plugin framework. Developed by SmashBalloon Team.",
     "type": "library",
     "version": "1.0.0",
     "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
-            "Smashballoon\\Notices\\": "src/"
+            "Smashballoon\\Notices\\": "",
+            "files": ["Utilites/functions.php"]
         }
     },
     "require": {},

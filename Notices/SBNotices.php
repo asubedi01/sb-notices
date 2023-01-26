@@ -5,9 +5,9 @@
  * @package SBNotices
  */
 
-namespace Smashballoon\Notices\Notices;
+namespace Smashballoon\Framework\Notices;
 
-use Smashballoon\Notices\Notices\Admin_Notice;
+use Smashballoon\Framework\Notices\AdminNotice;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @package Notice
  */
-class SBI_Notices {
+class SBNotices {
 
 	/**
 	 * Notices
@@ -101,7 +101,7 @@ class SBI_Notices {
 					case 'error':
 					case 'warning':
 					case 'information':
-						$error = new Admin_Notice( $notice );
+						$error = new AdminNotice( $notice );
 						$error->display();
 						break;
 

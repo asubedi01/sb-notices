@@ -5,7 +5,7 @@
  * @package SBNotices
  */
 
-namespace Smashballoon\Notices\Notices;
+namespace Smashballoon\Framework\Notices;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.

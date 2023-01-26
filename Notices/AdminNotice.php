@@ -6,7 +6,9 @@
  * @subpackage Notices
  */
 
-namespace Smashballoon\Notices\Notices;
+namespace Smashballoon\Framework\Notices;
+
+use function Smashballoon\Framework\sb_get_template;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -15,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Admin notice class.
  */
-class Admin_Notice extends Notice {
+class AdminNotice extends Notice {
 
 	/**
 	 * Display notice.
@@ -222,7 +224,7 @@ class Admin_Notice extends Notice {
 	public function print_notice( $notice ) {
 		ob_start();
 
-		sb_notices_get_template(
+		sb_get_template(
 			"notices/{$this->type}.php",
 			array(
 				'notice' => $notice,
@@ -232,7 +234,7 @@ class Admin_Notice extends Notice {
 		);
 
 		$notice_html = ob_get_clean();
-		$notice_html = apply_filters( "sbi_{$this->type}_notice_markup", $notice_html );
+		$notice_html = apply_filters( "sb_{$this->type}_notice_markup", $notice_html );
 		echo $notice_html;
 	}
 
