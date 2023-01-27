@@ -124,3 +124,24 @@ if ( ! function_exists( 'sb_get_template' ) ) {
 		do_action( 'sb_after_template_part', $action_args['template_name'], $action_args['template_path'], $action_args['located'], $action_args['args'] );
 	}
 }
+
+if( ! function_exists( 'sb_map_notice_hooks' ) ) {
+	/**
+	 * Map notices hooks as per plugin name.
+	 * 
+	 * @param string $plugin_name Plugin name.
+	 * 
+	 * @return string $plugin_hook Plugin hook.
+	 */
+	function sb_map_notice_hooks( $plugin_name ) {
+		
+		$notice_hooks = array(
+			'instagram-feed' => 'sbi_admin_notices',
+			'instagram-feed-pro' => 'sbi_admin_notices',
+		);
+
+		$plugin_hook = isset( $notice_hooks[ $plugin_name ] ) ? $notice_hooks[ $plugin_name ] : 'admin_notices';
+
+		return $plugin_hook;
+	}
+}

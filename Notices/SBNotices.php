@@ -8,6 +8,7 @@
 namespace Smashballoon\Framework\Notices;
 
 use Smashballoon\Framework\Notices\AdminNotice;
+use function Smashballoon\Framework\sb_map_notice_hooks;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -42,15 +43,60 @@ class SBNotices {
 	private $screen;
 
 	/**
+	 * Plugin name
+	 * @var string
+	 */
+	private $plugin_name;
+
+	/**
+	 * Notice options
+	 * @var string
+	 */
+	private $notice_option;
+	private $group_notice_option;
+
+	/**
+	 * The single instance of the class.
+	 *
+	 * @var SBNotices
+	 */
+	protected static $instance = null;
+
+	/**
+	 * Main SBNotices Instance.
+	 *
+	 * Ensures only one instance of SBNotices is loaded or can be loaded.
+	 *
+	 * @since 1.0.0
+	 * @static
+	 * @return SBNotices - Main instance.
+	 */
+	public static function instance( $plugin_name = '' ) {
+		if ( is_null( self::$instance ) ) {
+			self::$instance = new self( $plugin_name );
+		}
+
+		return self::$instance;
+	}
+
+	/**
 	 * Constructor
 	 */
-	public function __construct() {
-		$this->notices       = get_option( 'sbi_notices', array() );
-		$this->screen        = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
-		$this->group_notices = get_option( 'sbi_group_notices', array() );
+	public function __construct( $plugin_name = '' ) {
+		$this->plugin_name         = $plugin_name;
+		$plugin_name               = str_replace( '-', '_', $plugin_name );
+		$this->notice_option       = sanitize_key( 'sb_' . $plugin_name . '_notices' );
+		$this->group_notice_option = sanitize_key( 'sb_' . $plugin_name . '_group_notices' );
+		$this->notices             = get_option( $this->notice_option, array() );
+		$this->screen              = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : '';
+		$this->group_notices       = get_option( $this->group_notice_option, array() );
+
+		$notice_hook = sb_map_notice_hooks( $this->plugin_name );
 
 		add_action( 'admin_notices', array( $this, 'display_notices' ) );
-		add_action( 'sbi_admin_notices', array( $this, 'display_notices' ) );
+		add_action( $notice_hook, array( $this, 'display_notices' ) );
+
+		add_action( 'admin_init', array( $this, 'dismiss_notices' ), 20 );
 	}
 
 	/**
@@ -116,9 +162,15 @@ class SBNotices {
 	private function validate_notices() {
 		$notices = $this->get_notices();
 
+		$has_admin_errors = apply_filters( 'sb_has_admin_errors', false );
+
 		if ( $notices ) {
 			foreach ( $notices as $key => $notice ) {
 				if ( ! isset( $notice['type'] ) || ! isset( $notice['message'] ) ) {
+					unset( $notices[ $key ] );
+				}
+				// Check if critical error is present then unset 'information' notices.
+				if ( $has_admin_errors && in_array( $notice['type'], array( 'information', 'warning' ), true ) ) {
 					unset( $notices[ $key ] );
 				}
 				// Check start and end date, and unset if expired.
@@ -173,7 +225,7 @@ class SBNotices {
 				}
 			);
 
-			// $notices = apply_filters( 'sbi_admin_notices', $notices );
+			$notices = apply_filters( 'sb_admin_notices', $notices );
 			$this->set_notices( $notices );
 		}
 	}
@@ -235,7 +287,7 @@ class SBNotices {
 
 		// Update notices.
 		$this->set_notices( $notices );
-		update_option( 'sbi_notices', $notices );
+		update_option( $this->notice_option, $notices );
 
 		// Handle group notices.
 		if ( $group ) {
@@ -245,7 +297,7 @@ class SBNotices {
 			}
 			$group_notices[ $group ][] = $id;
 			$this->set_group_notices( $group_notices );
-			update_option( 'sbi_group_notices', $group_notices );
+			update_option( $this->group_notice_option, $group_notices );
 		}
 	}
 
@@ -266,13 +318,63 @@ class SBNotices {
 				if ( isset( $group_notices[ $group_id ] ) ) {
 					$group_notices[ $group_id ] = array_diff( $group_notices[ $group_id ], array( $id ) );
 					$this->set_group_notices( $group_notices );
-					update_option( 'sbi_group_notices', $group_notices );
+					update_option( $this->group_notice_option, $group_notices );
 				}
 			}
 
 			unset( $notices[ $id ] );
 			$this->set_notices( $notices );
-			update_option( 'sbi_notices', $notices );
+			update_option( $this->notice_option, $notices );
+		}
+	}
+
+	/**
+	 * Remove all notices
+	 * @return void
+	 */
+	public function remove_all_notices() {
+		$this->set_notices( array() );
+		$this->set_group_notices( array() );
+		delete_option( $this->notice_option );
+		delete_option( $this->group_notice_option );
+	}
+
+	/**
+	 * Dismiss notices if the GET param is set.
+	 * @return void
+	 */
+	public function dismiss_notices() {
+		if ( isset( $_GET['sb-dismiss-notice'] ) && isset( $_GET['_sb_notice_nonce'] ) ) { 
+			if ( ! wp_verify_nonce( wp_unslash( $_GET['_sb_notice_nonce'] ), 'sb_dismiss_notice_nonce' ) ) { 
+				wp_die( esc_html__( 'Action failed. Please refresh the page and retry.', 'sb-notices' ) );
+			}
+
+			$notice_id = sanitize_text_field( wp_unslash( $_GET['sb-dismiss-notice'] ) );
+
+			$notices = $this->get_notices();
+			if ( isset( $notices[ $notice_id ] ) ) {
+				$notice = $notices[ $notice_id ];
+
+				if ( ! $notice['dismissible'] ) {
+					wp_die( esc_html__( 'Notice cannot be dismissed.', 'sb-notices' ) );
+				}
+
+				if ( isset( $notice['capability'] ) && ! empty( $notice['capability'] ) ) {
+					$capability = $notice['capability'];
+					if ( ! is_array( $capability ) ) {
+						$capability = array( $capability );
+					}
+					if ( ! current_user_can( $capability[0] ) ) {
+						wp_die( esc_html__( 'You do not have permission to dismiss the notice.', 'sb-notices' ) );
+					}
+				}
+
+				$this->remove_notice( $notice_id );
+
+				update_user_meta( get_current_user_id(), 'sb_notice_' . $notice_id . '_dismissed', true );
+
+				do_action( 'sb_notice_' . $notice_id . '_dismissed', $notice_id );
+			}
 		}
 	}
 }
