@@ -5,7 +5,7 @@
  * @package SBNotices
  */
 
-namespace Smashballoon\Framework\Notices;
+namespace Smashballoon\Framework\Packages\Notices;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -195,6 +195,8 @@ abstract class Notice {
 			'class'  => array(),
 			'id'     => array(),
 			'rel'    => array(),
+			'style'  => array(),
+			'data-*'  => true,
 		),
 		'br'     => array(),
 		'em'     => array(),
@@ -203,20 +205,32 @@ abstract class Notice {
 			'class' => array(),
 			'id'    => array(),
 			'style' => array(),
+			'data-*'  => true,
 		),
 		'p'      => array(
 			'class' => array(),
 			'id'    => array(),
+			'style' => array(),
+			'data-*'  => true,
 		),
 		'div'    => array(
 			'class' => array(),
 			'id'    => array(),
+			'style' => array(),
+			'data-*'  => true,
 		),
 		'img'    => array(
 			'src'   => array(),
 			'class' => array(),
 			'id'    => array(),
 			'alt'   => array(),
+		),
+		'button' => array(
+			'class' => array(),
+			'id'    => array(),
+			'type'  => array(),
+			'style' => array(),
+			'data-*'  => true,
 		),
 	);
 

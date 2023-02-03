@@ -2,12 +2,12 @@
 /**
  * Notices class
  *
- * @package SBNotices
+ * @package Notices
  */
 
-namespace Smashballoon\Framework\Notices;
+namespace Smashballoon\Framework\Packages\Notices;
 
-use Smashballoon\Framework\Notices\AdminNotice;
+use Smashballoon\Framework\Packages\Notices\AdminNotice;
 use function Smashballoon\Framework\sb_map_notice_hooks;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Get all notices and display error warning or success notices
  *
- * @package Notice
+ * @package Notices
  */
 class SBNotices {
 

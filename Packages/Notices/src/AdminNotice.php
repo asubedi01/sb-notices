@@ -6,7 +6,7 @@
  * @subpackage Notices
  */
 
-namespace Smashballoon\Framework\Notices;
+namespace Smashballoon\Framework\Packages\Notices;
 
 use function Smashballoon\Framework\sb_get_template;
 

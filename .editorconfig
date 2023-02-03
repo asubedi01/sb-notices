@@ -1,0 +1,18 @@
+root = true
+
+[{*.json,*.xml,*.lock}]
+insert_final_newline = false
+trim_trailing_whitespace = true
+
+[{*.json,*.xml}]
+indent_style = tab
+indent_size = 4
+tab_width = 4
+
+[{*.php,*.js}]
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = tab
+indent_size = 4
+tab_width = 4
