@@ -2,10 +2,12 @@
 /**
  * Notice class
  *
- * @package SBNotices
+ * @package Notices
  */
 
-namespace Smashballoon\Framework\Packages\Notices;
+namespace Smashballoon\Framework\Packages\Notification\Notices;
+
+use Smashballoon\Framework\Packages\Notification\Notices\NoticeFields;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -32,23 +34,9 @@ abstract class Notice {
 	/**
 	 * Notice title
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $title;
-
-	/**
-	 * Notice title class
-	 *
-	 * @var string
-	 */
-	protected $title_class;
-
-	/**
-	 * Notice title tag
-	 *
-	 * @var string
-	 */
-	protected $title_tag;
 
 	/**
 	 * Notice icon
@@ -183,57 +171,6 @@ abstract class Notice {
 		'styles'     => '',
 	);
 
-	/** Content allowed tags
-	 *
-	 * @var array
-	 */
-	protected $allowed_tags = array(
-		'a'      => array(
-			'href'   => array(),
-			'title'  => array(),
-			'target' => array(),
-			'class'  => array(),
-			'id'     => array(),
-			'rel'    => array(),
-			'style'  => array(),
-			'data-*'  => true,
-		),
-		'br'     => array(),
-		'em'     => array(),
-		'strong' => array(),
-		'span'   => array(
-			'class' => array(),
-			'id'    => array(),
-			'style' => array(),
-			'data-*'  => true,
-		),
-		'p'      => array(
-			'class' => array(),
-			'id'    => array(),
-			'style' => array(),
-			'data-*'  => true,
-		),
-		'div'    => array(
-			'class' => array(),
-			'id'    => array(),
-			'style' => array(),
-			'data-*'  => true,
-		),
-		'img'    => array(
-			'src'   => array(),
-			'class' => array(),
-			'id'    => array(),
-			'alt'   => array(),
-		),
-		'button' => array(
-			'class' => array(),
-			'id'    => array(),
-			'type'  => array(),
-			'style' => array(),
-			'data-*'  => true,
-		),
-	);
-
 	/**
 	 * Current screen.
 	 *
@@ -254,8 +191,6 @@ abstract class Notice {
 				'type'               => 'error',
 				'message'            => '',
 				'title'              => '',
-				'title_class'        => '',
-				'title_tag'          => 'h3',
 				'icon'               => '',
 				'image'              => '',
 				'class'              => '',
@@ -278,8 +213,6 @@ abstract class Notice {
 		$this->type               = $args['type'];
 		$this->message            = $args['message'];
 		$this->title              = $args['title'];
-		$this->title_class        = $args['title_class'];
-		$this->title_tag          = $args['title_tag'];
 		$this->icon               = $args['icon'];
 		$this->image              = $args['image'];
 		$this->class              = $args['class'];
@@ -296,6 +229,8 @@ abstract class Notice {
 		$this->nav                = $args['nav'];
 		$this->navigation         = $args['navigation'];
 		$this->styles             = $args['styles'];
+
+		NoticeFields::set_screen( $this->screen );
 	}
 
 	/**
@@ -321,71 +256,6 @@ abstract class Notice {
 		}
 
 		return $notice;
-	}
-
-	/**
-	 * Check condition.
-	 *
-	 * @param array $condition
-	 *
-	 * @return bool
-	 */
-	public function check_condition( $condition ) {
-		$check = false;
-		switch ( $condition['key'] ) {
-			case 'screen':
-				$check = $this->check_screen( $condition['compare'], $condition['value'] );
-				break;
-			case 'option':
-				$check = $this->check_option( $condition['name'], $condition['compare'], $condition['value'] );
-				break;
-		}
-		return $check;
-	}
-
-
-	/**
-	 * Check screen.
-	 *
-	 * @param string $compare
-	 * @param string $screen
-	 *
-	 * @return bool
-	 */
-	public function check_screen( $compare, $screen ) {
-		$check = false;
-		switch ( $compare ) {
-			case '===':
-				$check = $screen === $this->screen;
-				break;
-			case '!==':
-				$check = $screen !== $this->screen;
-				break;
-		}
-		return $check;
-	}
-
-	/**
-	 * Check option.
-	 *
-	 * @param string $name
-	 * @param string $compare
-	 * @param string $value
-	 *
-	 * @return bool
-	 */
-	public function check_option( $name, $compare, $value ) {
-		$check  = false;
-		$option = get_option( $name );
-		switch ( $compare ) {
-			case '===':
-				$check = $option === $value;
-				break;
-			case '!==':
-				$check = $option !== $value;
-				break;
-		}
-		return $check;
 	}
 
 }

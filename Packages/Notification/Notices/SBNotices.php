@@ -5,9 +5,9 @@
  * @package Notices
  */
 
-namespace Smashballoon\Framework\Packages\Notices;
+namespace Smashballoon\Framework\Packages\Notification\Notices;
 
-use Smashballoon\Framework\Packages\Notices\AdminNotice;
+use Smashballoon\Framework\Packages\Notification\Notices\AdminNotice;
 use function Smashballoon\Framework\sb_map_notice_hooks;
 
 if ( ! defined( 'ABSPATH' ) ) {
