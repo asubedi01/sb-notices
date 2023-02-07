@@ -43,8 +43,8 @@ Replace the `instagram-feed-pro` with your plugin slug.
 ```php
 $sbi_notices->add_notice( 'notice-id', 'notice-type', 'notice-args' );
 ```
-notice-id: Unique ID for the notice.
-notice-type: Type of notice. Can be `error`, `warning`, `information`.
+notice-id: Unique ID for the notice.<br>
+notice-type: Type of notice. Can be `error`, `warning`, `information`.<br>
 notice-args: Array of arguments for the notice.
 
 ### Remove a notice
